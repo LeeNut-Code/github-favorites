@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栗子的GitHub收藏夹</title>
+<style>
+/* ============ Reset & Base ============ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+  min-height: 100vh;
+}
+
+/* ============ Theme Variables ============ */
+:root {
+  --bg: #FFF8F0;
+  --surface: #FFFFFF;
+  --surface-hover: #FFF3E0;
+  --text: #2C2416;
+  --text-secondary: #8B7355;
+  --text-muted: #B8A88E;
+  --primary: #C4943E;
+  --primary-light: #E8D5A8;
+  --primary-dark: #A07530;
+  --border: #E8DDD0;
+  --tag-bg: #F5EDE0;
+  --tag-text: #8B7355;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.10);
+  --input-bg: #FFFFFF;
+  --input-border: #D4C8B8;
+  --header-bg: rgba(255, 248, 240, 0.92);
+  --tab-active-bg: #C4943E;
+  --tab-active-text: #FFFFFF;
+  --tab-hover-bg: #F0E6D8;
+  --badge-bg: #C4943E;
+  --badge-text: #FFFFFF;
+  --link-color: #2D8E4A;
+  --divider: #E8DDD0;
+  --stat-card-bg: #FFFDF8;
+}
+
+[data-theme="dark"] {
+  --bg: #1A1510;
+  --surface: #2A2218;
+  --surface-hover: #3A3022;
+  --text: #E8DCC8;
+  --text-secondary: #B8A88E;
+  --text-muted: #7A6A54;
+  --primary: #D4A74B;
+  --primary-light: #5A4A32;
+  --primary-dark: #E8C87A;
+  --border: #3A3228;
+  --tag-bg: #3A3022;
+  --tag-text: #C8B898;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.3);
+  --input-bg: #2A2218;
+  --input-border: #4A3E2E;
+  --header-bg: rgba(26, 21, 16, 0.92);
+  --tab-hover-bg: #3A3022;
+  --badge-bg: #D4A74B;
+  --badge-text: #1A1510;
+  --link-color: #5BBF7A;
+  --divider: #3A3228;
+  --stat-card-bg: #222016;
+}
+
+/* ============ Header ============ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--header-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+.header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+.header-title span {
+  color: var(--primary);
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.theme-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  line-height: 1;
+}
+.theme-btn:hover {
+  background: var(--surface-hover);
+  color: var(--primary);
+}
+
+/* ============ Stats Bar ============ */
+.stats-bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.stat-card {
+  background: var(--stat-card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+}
+.stat-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ============ Month Tabs ============ */
+.tabs-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px 0;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.tabs::-webkit-scrollbar {
+  height: 4px;
+}
+.tabs::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+.tab-btn {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.tab-btn:hover {
+  background: var(--tab-hover-bg);
+  color: var(--text);
+}
+.tab-btn.active {
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
+  border-color: var(--tab-active-bg);
+}
+.tab-count {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* ============ Filters ============ */
+.filters {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-box {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+.search-box input {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-box input:focus {
+  border-color: var(--primary);
+}
+.search-box .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 16px;
+  pointer-events: none;
+}
+.category-filter select {
+  padding: 10px 14px;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  min-width: 120px;
+}
+.category-filter select:focus {
+  border-color: var(--primary);
+}
+
+/* ============ Card Grid ============ */
+.grid-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 24px 40px;
+}
+.grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.grid-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.card:hover {
+  box-shadow: var(--card-shadow-hover);
+  border-color: var(--primary-light);
+  transform: translateY(-1px);
+}
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+.card-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.card-name:hover {
+  color: var(--link-color);
+}
+.card-name .owner {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.card-link {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--tag-bg);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.card-link:hover {
+  background: #2D8E4A;
+  color: white;
+}
+[data-theme="dark"] .card-link:hover {
+  background: #5BBF7A;
+  color: #1A1510;
+}
+.card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.card-footer {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+}
+.tag-month {
+  background: var(--badge-bg);
+  color: var(--badge-text);
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-state .empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+}
+.empty-state p {
+  font-size: 15px;
+}
+
+/* ============ Back to Top ============ */
+.back-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--badge-text);
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  z-index: 90;
+}
+.back-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.back-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.back-top.visible:hover {
+  transform: translateY(-2px);
+}
+
+/* ============ Footer ============ */
+.footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+
+/* ============ Responsive ============ */
+@media (max-width: 768px) {
+  .header { padding: 12px 16px; }
+  .header-title { font-size: 17px; }
+  .stats-bar { padding: 16px 16px 0; grid-template-columns: repeat(2, 1fr); }
+  .tabs-wrapper { padding: 12px 16px 0; }
+  .filters { padding: 8px 16px; flex-direction: column; }
+  .search-box { min-width: 100%; }
+  .category-filter select { width: 100%; }
+  .grid-wrapper { padding: 8px 16px 24px; }
+  .grid { grid-template-columns: 1fr; }
+  .stat-card { padding: 10px 12px; }
+  .stat-number { font-size: 20px; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <span class="header-icon">🌰</span>
+      <h1 class="header-title">栗子的<span>GitHub</span>收藏夹</h1>
+    </div>
+    <div class="header-right">
+      <button class="theme-btn" id="themeToggle" title="切换主题">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ STATS ============ -->
+<div class="stats-bar" id="statsBar"></div>
+
+<!-- ============ TABS ============ -->
+<div class="tabs-wrapper">
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<!-- ============ FILTERS ============ -->
+<div class="filters">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="搜索项目名称、描述..." />
+  </div>
+  <div class="category-filter">
+    <select id="categoryFilter">
+      <option value="">全部分类</option>
+    </select>
+  </div>
+</div>
+
+<!-- ============ GRID ============ -->
+<div class="grid-wrapper">
+  <div class="grid-header">
+    <span class="grid-count" id="gridCount"></span>
+  </div>
+  <div class="grid" id="projectGrid"></div>
+</div>
+
+<!-- ============ BACK TO TOP ============ -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  栗子的GitHub收藏夹 &middot; 共 274 个项目 &middot; 持续更新中 🚀
+</footer>
+
+<script>
+// ============ DATA ============
+const PROJECTS = [{"name": "AppImageCommunity/pkg2appimage", "url": "https://github.com/AppImageCommunity/pkg2appimage", "description": "将现有的 deb 软件包转换为 AppImage 的工具", "month": "202510", "monthLabel": "2025.10", "category": "社交 / 社区"}, {"name": "Olcmyk/HuChenFeng", "url": "https://github.com/Olcmyk/HuChenFeng", "description": "收集户晨风的所有内容", "month": "202510", "monthLabel": "2025.10", "category": "社交 / 社区"}, {"name": "Playboy", "url": "https://github.com/Playboy-Player/Playboy?tab=readme-ov-file", "description": "基于 libmpv 的跨平台桌面播放器", "month": "202510", "monthLabel": "2025.10", "category": "媒体工具"}, {"name": "开源精选", "url": "https://github.com/maxiaobang7/ossnav", "description": "探索免费优质的开源软件工具", "month": "202510", "monthLabel": "2025.10", "category": "Awesome 列表"}, {"name": "rossant/awesome-math", "url": "https://github.com/rossant/awesome-math", "description": "很棒的数学棒  精选的超棒数学资源列表。", "month": "202510", "monthLabel": "2025.10", "category": "Awesome 列表"}, {"name": "youhunwl/TVAPP", "url": "https://github.com/youhunwl/TVAPP", "description": "TVAPP 优质应用 TVBox点播直播源收集", "month": "202510", "monthLabel": "2025.10", "category": "媒体工具"}, {"name": "DTan084/Awesome-README", "url": "https://github.com/DTan084/Awesome-README", "description": "关于  精选的精彩 README 模板集合", "month": "202510", "monthLabel": "2025.10", "category": "系统工具"}, {"name": "XiaoYouChR/Ghost-Downloader-3", "url": "https://github.com/XiaoYouChR/Ghost-Downloader-3", "description": "XiaoYouChR/Ghost-Downloader-3", "month": "202510", "monthLabel": "2025.10", "category": "系统工具"}, {"name": "keven1024/015", "url": "https://github.com/keven1024/015", "description": "零一五-自托管临时文件共享平台", "month": "202510", "monthLabel": "2025.10", "category": "系统工具"}, {"name": "chiwent/awesome-linux-software-cn", "url": "https://github.com/chiwent/awesome-linux-software-cn", "description": "Linux 优秀软件资源大全中文版", "month": "202510", "monthLabel": "2025.10", "category": "系统工具"}, {"name": "nashaofu/shell360", "url": "https://github.com/nashaofu/shell360/blob/master/README-zh_cn.md", "description": "Shell360 -SSH &amp; SFTP 客户端", "month": "202510", "monthLabel": "2025.10", "category": "网络工具"}, {"name": "synctv-org/synctv", "url": "https://github.com/synctv-org/synctv/blob/main/README-CN.md", "description": "SyncTV-远程一起看电影/直播", "month": "202510", "monthLabel": "2025.10", "category": "媒体工具"}, {"name": "ckissi/Learn-by-projects", "url": "https://github.com/ckissi/Learn-by-projects", "description": "项目式学习  编程教程列表", "month": "202510", "monthLabel": "2025.10", "category": "编程开发"}, {"name": "farhanashrafdev/90DaysOfCyberSecurity", "url": "https://github.com/farhanashrafdev/90DaysOfCyberSecurity", "description": "90 天网络安全学习计划", "month": "202510", "monthLabel": "2025.10", "category": "网络工具"}, {"name": "alMubarmij/Awesome-AppImage", "url": "https://github.com/alMubarmij/Awesome-AppImage?tab=readme-ov-file", "description": "Awesome-AppImage", "month": "202510", "monthLabel": "2025.10", "category": "Awesome 列表"}, {"name": "Sumanth077/ai-engineering-toolkit", "url": "https://github.com/Sumanth077/ai-engineering-toolkit", "description": "人工智能工程工具包🔥", "month": "202510", "monthLabel": "2025.10", "category": "AI / Agent 工具"}, {"name": "9001/copyparty", "url": "https://github.com/9001/copyparty", "description": "便携式文件服务器", "month": "202510", "monthLabel": "2025.10", "category": "网络工具"}, {"name": "skywind3000/preserve-cd", "url": "https://github.com/skywind3000/preserve-cd", "description": "绝版游戏保护工程", "month": "202510", "monthLabel": "2025.10", "category": "编程开发"}, {"name": "jbiaojerry/ebook-treasure-chest", "url": "https://github.com/jbiaojerry/ebook-treasure-chest", "description": "电子书下载宝库", "month": "202510", "monthLabel": "2025.10", "category": "学习资源"}, {"name": "gedoor/gedoor.github.io", "url": "https://github.com/gedoor/gedoor.github.io", "description": "开源阅读", "month": "202510", "monthLabel": "2025.10", "category": "编程开发"}, {"name": "MixGram", "url": "https://github.com/InvertGeek/MixGram", "description": "基于 Git 协议的安卓聊天 APP, 真正的端到端加密聊天", "month": "202511", "monthLabel": "2025.11", "category": "编程开发"}, {"name": "SeptemberHX/MPaste", "url": "https://github.com/SeptemberHX/MPaste", "description": "Linux 和 Windows 版 Paste 的剪贴板管理器替代方案", "month": "202511", "monthLabel": "2025.11", "category": "桌面工具"}, {"name": "Myna", "url": "https://github.com/sayyadirfanali/Myna/", "description": "为符号丰富编程设计的 Monospace 字体", "month": "202511", "monthLabel": "2025.11", "category": "编程开发"}, {"name": "noemoji", "url": "https://github.com/black8848/noemoji", "description": "批量扫描并删除文件中的 emoji 表情", "month": "202511", "monthLabel": "2025.11", "category": "系统工具"}, {"name": "iptv", "url": "https://github.com/zhi35/iptv", "description": "📺 一个每天自动更新的 IPTV 直播源项目", "month": "202511", "monthLabel": "2025.11", "category": "媒体工具"}, {"name": "china-domain-allowlist", "url": "https://github.com/pluwen/china-domain-allowlist", "description": "常用中国网站白名单", "month": "202511", "monthLabel": "2025.11", "category": "AI / Agent 工具"}, {"name": "dns-benchmark-tool", "url": "https://github.com/frankovo/dns-benchmark-tool", "description": "DNS基准测试工具", "month": "202511", "monthLabel": "2025.11", "category": "系统工具"}, {"name": "gocron", "url": "https://github.com/gocronx-team/gocron", "description": "分布式定时任务管理系统", "month": "202511", "monthLabel": "2025.11", "category": "系统工具"}, {"name": "block-ads", "url": "https://github.com/AzureIvory/block-ads", "description": "禁止流氓垃圾进程运行", "month": "202511", "monthLabel": "2025.11", "category": "系统工具"}, {"name": "tiny-svg", "url": "https://github.com/hehehai/tiny-svg", "description": "SVG优化器和代码生成器", "month": "202511", "monthLabel": "2025.11", "category": "系统工具"}, {"name": "RubyMetric/chsrc", "url": "https://github.com/RubyMetric/chsrc", "description": "chsrc 全平台通用换源工具与框架", "month": "202511", "monthLabel": "2025.11", "category": "系统工具"}, {"name": "Laranode", "url": "https://github.com/crivion/laranode", "description": "开源托管控制面板", "month": "202511", "monthLabel": "2025.11", "category": "系统工具"}, {"name": "MusicBox", "url": "https://github.com/asxez/MusicBox", "description": "本地音乐播放器", "month": "202511", "monthLabel": "2025.11", "category": "媒体工具"}, {"name": "HCLonely/awesome-bilibili-extra", "url": "https://github.com/HCLonely/awesome-bilibili-extra", "description": "awesome-bilibili-extra", "month": "202511", "monthLabel": "2025.11", "category": "媒体工具"}, {"name": "biu", "url": "https://github.com/wood3n/biu/", "description": "Bilibili音乐播放器", "month": "202511", "monthLabel": "2025.11", "category": "媒体工具"}, {"name": "MashiroSaber03/Saber-Translator", "url": "https://github.com/MashiroSaber03/Saber-Translator", "description": "Saber-Translator", "month": "202511", "monthLabel": "2025.11", "category": "编程开发"}, {"name": "hhhweihan/EasyTshark", "url": "https://github.com/hhhweihan/EasyTshark", "description": "EasyTshark", "month": "202511", "monthLabel": "2025.11", "category": "网络工具"}, {"name": "ZeroDeng01/sublinkPro", "url": "https://github.com/ZeroDeng01/sublinkPro", "description": "sublinkPro", "month": "202511", "monthLabel": "2025.11", "category": "编程开发"}, {"name": "iflow-ai/iflow-cli", "url": "https://github.com/iflow-ai/iflow-cli/blob/main/README_CN.md", "description": "iFlow CLI", "month": "202511", "monthLabel": "2025.11", "category": "AI / Agent 工具"}, {"name": "WSABuilds", "url": "https://github.com/MustardChef/WSABuilds", "description": "Run Windows Subsystem For Android on your Windows", "month": "202512", "monthLabel": "2025.12", "category": "系统工具"}, {"name": "MyTube", "url": "https://github.com/franklioxygen/MyTube", "description": "A YouTube/Bilibili/MissAV video downloader", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "awesome-cloudflare", "url": "https://github.com/zhuima/awesome-cloudflare", "description": "⛅️ 精选的 Cloudflare 工具", "month": "202512", "monthLabel": "2025.12", "category": "Awesome 列表"}, {"name": "GoodbyeDPI", "url": "https://github.com/ValdikSS/GoodbyeDPI", "description": "深度数据包检测规避工具", "month": "202512", "monthLabel": "2025.12", "category": "网络工具"}, {"name": "bilidown", "url": "https://github.com/iuroc/bilidown", "description": "哔哩哔哩视频解析下载工具", "month": "202512", "monthLabel": "2025.12", "category": "媒体工具"}, {"name": "roubao", "url": "https://github.com/Turbo1123/roubao", "description": "Android Automation Tool", "month": "202512", "monthLabel": "2025.12", "category": "系统工具"}, {"name": "donlon/cloudflare-error-page", "url": "https://github.com/donlon/cloudflare-error-page", "description": "Cloudflare error page generator", "month": "202512", "monthLabel": "2025.12", "category": "网络工具"}, {"name": "tjxwork/bilibili_blocked_videos_by_tags", "url": "https://github.com/tjxwork/bilibili_blocked_videos_by_tags", "description": "bilibili_blocked_videos_by_tags", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "Daidai0912/x-via", "url": "https://github.com/Daidai0912/x-via", "description": "X 浏览器与 Via 丨辅助向指南", "month": "202512", "monthLabel": "2025.12", "category": "AI / Agent 工具"}, {"name": "supermium", "url": "https://github.com/win32ss/supermium", "description": "win7/xp浏览器", "month": "202512", "monthLabel": "2025.12", "category": "浏览器扩展"}, {"name": "LiteMonitor", "url": "https://github.com/Diorser/LiteMonitor", "description": "硬件监控", "month": "202512", "monthLabel": "2025.12", "category": "系统工具"}, {"name": "SocialSisterYi/bilibili-API-collect", "url": "https://github.com/SocialSisterYi/bilibili-API-collect", "description": "哔哩哔哩-API收集整理", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "mosdns", "url": "https://github.com/IrineSistiana/mosdns", "description": "DNS 转发器", "month": "202512", "monthLabel": "2025.12", "category": "网络工具"}, {"name": "lanceliao/china-holiday-calender", "url": "https://github.com/lanceliao/china-holiday-calender", "description": "2023-2025 中国节假日", "month": "202512", "monthLabel": "2025.12", "category": "桌面工具"}, {"name": "WCY-dt/MrRSS", "url": "https://github.com/WCY-dt/MrRSS", "description": "MrRSS:", "month": "202512", "monthLabel": "2025.12", "category": "媒体工具"}, {"name": "brave/brave-browser", "url": "https://github.com/brave/brave-browser", "description": "Brave browser", "month": "202512", "monthLabel": "2025.12", "category": "浏览器扩展"}, {"name": "vsme/chinese-days", "url": "https://github.com/vsme/chinese-days", "description": "中国法定节假日", "month": "202512", "monthLabel": "2025.12", "category": "桌面工具"}, {"name": "zai-org/Open-AutoGLM", "url": "https://github.com/zai-org/Open-AutoGLM", "description": "Open-AutoGLM", "month": "202512", "monthLabel": "2025.12", "category": "AI / Agent 工具"}, {"name": "curl/curl", "url": "https://github.com/curl/curl/wiki/DNS-over-HTTPS", "description": "DNS over HTTPS", "month": "202512", "monthLabel": "2025.12", "category": "网络工具"}, {"name": "tada", "url": "https://github.com/LoadShine/tada", "description": "待办事项应用", "month": "202512", "monthLabel": "2025.12", "category": "系统工具"}, {"name": "CattoPic", "url": "https://github.com/Yuri-NagaSaki/CattoPic", "description": "自托管图床", "month": "202512", "monthLabel": "2025.12", "category": "桌面工具"}, {"name": "ashishpatel26/500-AI-Agents-Projects", "url": "https://github.com/ashishpatel26/500-AI-Agents-Projects", "description": "500-AI-Agents-项目", "month": "202512", "monthLabel": "2025.12", "category": "AI / Agent 工具"}, {"name": "ClashConnectRules/Self-Configuration", "url": "https://github.com/ClashConnectRules/Self-Configuration", "description": "个人代理工具配置集合", "month": "202512", "monthLabel": "2025.12", "category": "网络工具"}, {"name": "rnamoy/chrome_installer", "url": "https://github.com/rnamoy/chrome_installer", "description": "Google Chrome 离线安装包", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "MySpeed", "url": "https://github.com/gnmyt/MySpeed", "description": ".速度测试分析软件", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "GPTs", "url": "https://github.com/linexjlin/GPTs", "description": "leaked prompts of GPTs", "month": "202512", "monthLabel": "2025.12", "category": "AI / Agent 工具"}, {"name": "clock-dashboard", "url": "https://github.com/teojs/clock-dashboard", "description": "天气时钟看板", "month": "202512", "monthLabel": "2025.12", "category": "桌面工具"}, {"name": "qq61538187/flutterpassword", "url": "https://github.com/qq61538187/flutterpassword", "description": "FlutterPassword 桌面密码管理器", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "BetterLyrics", "url": "https://github.com/jayfunc/BetterLyrics", "description": "自定义的歌词/播放器应用", "month": "202512", "monthLabel": "2025.12", "category": "媒体工具"}, {"name": "YTSage", "url": "https://github.com/oop7/YTSage", "description": "Modern YouTube downloader", "month": "202512", "monthLabel": "2025.12", "category": "系统工具"}, {"name": "AudioVisual", "url": "https://github.com/RemotePinee/AudioVisual", "description": "解锁所有国内媒体流的钥匙", "month": "202512", "monthLabel": "2025.12", "category": "媒体工具"}, {"name": "Lumingtianze/vercel-doh-proxy", "url": "https://github.com/Lumingtianze/vercel-doh-proxy", "description": "Vercel DNS-over-HTTPS (DoH) 代理服务", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "blog-post-workflow", "url": "https://github.com/gautamkrishnar/blog-post-workflow", "description": "gihub主页展示博客文章", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "flutterChronoPlan", "url": "https://github.com/qq61538187/flutterChronoPlan", "description": "日历日程/待办管理桌面应用", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "cosmic-epoch", "url": "https://github.com/pop-os/cosmic-epoch", "description": "Next generation Cosmic desktop", "month": "202512", "monthLabel": "2025.12", "category": "桌面工具"}, {"name": "Screenbox", "url": "https://github.com/huynhsontung/Screenbox", "description": "基于LibVLC的通用Windows平台媒体播放器", "month": "202512", "monthLabel": "2025.12", "category": "系统工具"}, {"name": "bestruirui/octopus", "url": "https://github.com/bestruirui/octopus", "description": "One Hub All LLMs For You | 为个人打造的 LLM API 聚合服务", "month": "202512", "monthLabel": "2025.12", "category": "AI / Agent 工具"}, {"name": "proxypin", "url": "https://github.com/wanghongenpin/proxypin", "description": "Open source free capture HTTP(S) traffic software", "month": "202512", "monthLabel": "2025.12", "category": "编程开发"}, {"name": "AI4Engr/MADOLA", "url": "https://github.com/AI4Engr/MADOLA", "description": "MADOLA 将数学符号、计算、文档和代码生成整合到一个文件中", "month": "202512", "monthLabel": "2025.12", "category": "AI / Agent 工具"}, {"name": "PasteMD", "url": "https://github.com/RICHQAQ/PasteMD", "description": "一键将 Markdown 和网页 AI 对话完美粘贴到效率工具", "month": "202512", "monthLabel": "2025.12", "category": "AI / Agent 工具"}, {"name": "awesome-github-profile-readme-chinese", "url": "https://github.com/eryajf/awesome-github-profile-readme-chinese", "description": "🦩 优秀的中文区个人主页搜集", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "WeFlow", "url": "https://github.com/hicccc77/WeFlow/", "description": "WeFlow - 一个本地的微信聊天导出和年度报告应用", "month": "202601", "monthLabel": "2026.01", "category": "社交 / 社区"}, {"name": "nginxpulse", "url": "https://github.com/likaia/nginxpulse", "description": "轻量级 Nginx 访问日志分析与可视化面板", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "DockerCN", "url": "https://github.com/CandyMuj/DockerCN", "description": "针对中国网络环境的 Docker 使用优化", "month": "202601", "monthLabel": "2026.01", "category": "系统工具"}, {"name": "ClashConnectRules/Self-Configuration", "url": "https://github.com/ClashConnectRules/Self-Configuration/blob/main/README_CN.md", "description": "ClashConnectRules/个人代理工具配置文件集合", "month": "202601", "monthLabel": "2026.01", "category": "网络工具"}, {"name": "SmartHostsTool-github", "url": "https://github.com/KenDvD/SmartHostsTool-github", "description": "「智能 Host 测速工具", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "weixin-reader-desktop", "url": "https://github.com/dengcb/weixin-reader-desktop", "description": "轻量级微信读书客户端", "month": "202601", "monthLabel": "2026.01", "category": "桌面工具"}, {"name": "web-to-app", "url": "https://github.com/shiahonb777/web-to-app", "description": "将任意网站 URL 转换为独立App", "month": "202601", "monthLabel": "2026.01", "category": "桌面工具"}, {"name": "baihu-panel", "url": "https://github.com/engigu/baihu-panel", "description": "🐯轻量级定时任务管理系统", "month": "202601", "monthLabel": "2026.01", "category": "AI / Agent 工具"}, {"name": "bm.md", "url": "https://github.com/miantiao-me/bm.md", "description": "更好用的 Markdown 排版助手", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "LeafSort", "url": "https://github.com/YangShengzhou03/LeafSort", "description": "LeafSort（轻羽媒体整理）", "month": "202601", "monthLabel": "2026.01", "category": "媒体工具"}, {"name": "ai-guide", "url": "https://github.com/liyupi/ai-guide", "description": "程序员鱼皮的 AI 资源大全", "month": "202601", "monthLabel": "2026.01", "category": "AI / Agent 工具"}, {"name": "imsyy/home", "url": "https://github.com/imsyy/home", "description": "个人主页homepage", "month": "202601", "monthLabel": "2026.01", "category": "社交 / 社区"}, {"name": "breeze-shell", "url": "https://github.com/std-microblock/breeze-shell", "description": "Windows菜单替代", "month": "202601", "monthLabel": "2026.01", "category": "系统工具"}, {"name": "cvt", "url": "https://github.com/zsokami/cvt?tab=readme-ov-file", "description": "ACL4SSR Mannix 订阅转换", "month": "202601", "monthLabel": "2026.01", "category": "网络工具"}, {"name": "flutter_server_box", "url": "https://github.com/lollipopkit/flutter_server_box", "description": "ServerBox", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "x011/smtp-tunnel-proxy", "url": "https://github.com/x011/smtp-tunnel-proxy", "description": "x011/smtp-tunnel-proxy", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "Sanjeever/port_sentinel", "url": "https://github.com/Sanjeever/port_sentinel?tab=readme-ov-file", "description": "port_sentinel端口哨兵", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "AuroraNote", "url": "https://github.com/qqxt/AuroraNote", "description": "极光便签", "month": "202601", "monthLabel": "2026.01", "category": "桌面工具"}, {"name": "pbeenigg/LittleCrawler", "url": "https://github.com/pbeenigg/LittleCrawler", "description": "LittleCrawler/小爬虫", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "kaima2022/Health-reminder", "url": "https://github.com/kaima2022/Health-reminder", "description": "Health-reminder:", "month": "202601", "monthLabel": "2026.01", "category": "AI / Agent 工具"}, {"name": "BloopAI/vibe-kanban", "url": "https://github.com/BloopAI/vibe-kanban", "description": "vibe-kanban", "month": "202601", "monthLabel": "2026.01", "category": "AI / Agent 工具"}, {"name": "xs0521/GithubNote", "url": "https://github.com/xs0521/GithubNote", "description": "GithubNote", "month": "202601", "monthLabel": "2026.01", "category": "编程开发"}, {"name": "DearVa/Everywhere", "url": "https://github.com/DearVa/Everywhere/blob/main/README-zh-cn.md", "description": "Everywhere/具备情境感知能力的交互式 AI 助手", "month": "202602", "monthLabel": "2026.02", "category": "AI / Agent 工具"}, {"name": "hello-agents", "url": "https://github.com/datawhalechina/Hello-Agents", "description": "📚 从零开始构建智能体", "month": "202602", "monthLabel": "2026.02", "category": "AI / Agent 工具"}, {"name": "PixivSource", "url": "https://github.com/windyhusky/PixivSource", "description": "阅读 3.0 的 Pixiv 书源", "month": "202602", "monthLabel": "2026.02", "category": "媒体工具"}, {"name": "nanobot", "url": "https://github.com/HKUDS/nanobot#", "description": "&quot;🐈超轻量级个人AI助手", "month": "202602", "monthLabel": "2026.02", "category": "AI / Agent 工具"}, {"name": "lanzouyun-disk", "url": "https://github.com/chenhb23/lanzouyun-disk", "description": "蓝奏云网盘", "month": "202602", "monthLabel": "2026.02", "category": "媒体工具"}, {"name": "FeedCraft", "url": "https://github.com/Colin-XKL/FeedCraft", "description": "轻量级 rss 中间件", "month": "202602", "monthLabel": "2026.02", "category": "媒体工具"}, {"name": "Pip-Helper", "url": "https://github.com/yaolifeng0629/Pip-Helper", "description": "画中画", "month": "202602", "monthLabel": "2026.02", "category": "桌面工具"}, {"name": "NanaZip", "url": "https://github.com/M2Team/NanaZip", "description": "压缩软件", "month": "202602", "monthLabel": "2026.02", "category": "桌面工具"}, {"name": "InputShare", "url": "https://github.com/InputShare/InputShare", "description": "输入流转", "month": "202602", "monthLabel": "2026.02", "category": "桌面工具"}, {"name": "deskflow", "url": "https://github.com/deskflow/deskflow", "description": "多设备共享鼠标", "month": "202602", "monthLabel": "2026.02", "category": "桌面工具"}, {"name": "vinceliuice/grub2-themes", "url": "https://github.com/vinceliuice/grub2-themes", "description": "vinceliuice/grub2-themes", "month": "202602", "monthLabel": "2026.02", "category": "系统工具"}, {"name": "instantbox", "url": "https://github.com/instantbox/instantbox", "description": "📦Linux 快速启动栏", "month": "202602", "monthLabel": "2026.02", "category": "系统工具"}, {"name": "EcoPaste", "url": "https://github.com/EcoPasteHub/EcoPaste", "description": "🎉跨平台的剪贴板管理工具", "month": "202602", "monthLabel": "2026.02", "category": "桌面工具"}, {"name": "neko-master", "url": "https://github.com/foru17/neko-master", "description": "网络流量可视化与分析仪表盘", "month": "202602", "monthLabel": "2026.02", "category": "网络工具"}, {"name": "files-community/Files", "url": "https://github.com/files-community/files/", "description": "一个现代文件管理器", "month": "202602", "monthLabel": "2026.02", "category": "系统工具"}, {"name": "yt-dlp-script", "url": "https://github.com/nodeloc666/yt-dlp-script", "description": "一键脚本，可批量进行视频下载", "month": "202602", "monthLabel": "2026.02", "category": "媒体工具"}, {"name": "sudo-project", "url": "https://github.com/sudo-project/sudo", "description": "作为另一个用户执行命令的工具", "month": "202602", "monthLabel": "2026.02", "category": "编程开发"}, {"name": "extension-js/extension.js", "url": "https://github.com/extension-js/extension.js", "description": "🧩 跨浏览器扩展框架", "month": "202602", "monthLabel": "2026.02", "category": "浏览器扩展"}, {"name": "InternetTest", "url": "https://github.com/Leo-Corporation/InternetTest?tab=readme-ov-file", "description": "适用于 Windows 的现代连接工具", "month": "202602", "monthLabel": "2026.02", "category": "系统工具"}, {"name": "WebRPA", "url": "https://github.com/pmh1314520/WebRPA", "description": "一款功能强大的可视化网页自动化工具", "month": "202602", "monthLabel": "2026.02", "category": "编程开发"}, {"name": "RunCat365", "url": "https://github.com/Kyome22/RunCat365", "description": "Windows任务栏上可爱的猫咪奔跑动画", "month": "202602", "monthLabel": "2026.02", "category": "系统工具"}, {"name": "Tai", "url": "https://github.com/Planshit/Tai", "description": "👻 在 Windows 上统计软件使用时长和网站浏览时长", "month": "202602", "monthLabel": "2026.02", "category": "AI / Agent 工具"}, {"name": "NeutralPress", "url": "https://github.com/RavelloH/NeutralPress", "description": "基于 Next.js 构建的下一代动态 CMS 博客系统", "month": "202602", "monthLabel": "2026.02", "category": "编程开发"}, {"name": "nanobot", "url": "https://github.com/HKUDS/nanobot", "description": "&quot;🐈 nanobot: The Ultra-Lightweight OpenClaw&quot;", "month": "202602", "monthLabel": "2026.02", "category": "AI / Agent 工具"}, {"name": "TrackersListCollection", "url": "https://github.com/XIU2/TrackersListCollection", "description": "每天更新！全网热门 BT Tracker 列表！", "month": "202602", "monthLabel": "2026.02", "category": "Awesome 列表"}, {"name": "GoGoGo", "url": "https://github.com/ZCShou/GoGoGo", "description": "一个基于 Android 调试 API + 百度地图实现的虚拟定位工具", "month": "202602", "monthLabel": "2026.02", "category": "编程开发"}, {"name": "bilibili-linux", "url": "https://github.com/msojocs/bilibili-linux", "description": "基于哔哩哔哩官方客户端移植的 Linux 版本 支持漫游", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "cherrypick", "url": "https://github.com/elly-code/cherrypick", "description": "一个用于elementary OS的简单颜色选择器", "month": "202603", "monthLabel": "2026.03", "category": "桌面工具"}, {"name": "Presto", "url": "https://github.com/Presto-io/Presto", "description": "Markdown → Typst → PDF 桌面排版工具", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "CooperJiang/ClipLink", "url": "https://github.com/CooperJiang/ClipLink", "description": "ClipLink 是一款基于网页的跨设备剪贴板同步工具", "month": "202603", "monthLabel": "2026.03", "category": "桌面工具"}, {"name": "AppDataCleaner", "url": "https://github.com/TC999/AppDataCleaner", "description": "辅助清理 Appdata 的小工具", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "smart-cleaner", "url": "https://github.com/lifedever/smart-cleaner", "description": "指定目录垃圾清理 App", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "biliLive-tools", "url": "https://github.com/renmu123/biliLive-tools", "description": "直播一站式处理工具", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "agenticSeek", "url": "https://github.com/Fosowl/agenticSeek", "description": "完全本地的Manus AI", "month": "202603", "monthLabel": "2026.03", "category": "AI / Agent 工具"}, {"name": "wsl-dashboard", "url": "https://github.com/owu/wsl-dashboard/", "description": "WSL的GUI管理器", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "bostrot/wsl2-distro-manager", "url": "https://github.com/bostrot/wsl2-distro-manager", "description": "wsl2-distro-manager", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "SunnyPages", "url": "https://github.com/XMuli/SunnyPages", "description": "截图工具", "month": "202603", "monthLabel": "2026.03", "category": "桌面工具"}, {"name": "BitFun", "url": "https://github.com/GCWing/BitFun", "description": "下一代AI助手", "month": "202603", "monthLabel": "2026.03", "category": "AI / Agent 工具"}, {"name": "codedogQBY/ReadAny", "url": "https://github.com/codedogQBY/ReadAny", "description": "codedogQBY/ReadAny", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "calendar-diary", "url": "https://github.com/trustdev-org/calendar-diary", "description": "日历日记应用", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "star-m3u8", "url": "https://github.com/Lhy723/star-m3u8", "description": "M3U8 视频下载器", "month": "202603", "monthLabel": "2026.03", "category": "媒体工具"}, {"name": "AdRules", "url": "https://github.com/Cats-Team/AdRules", "description": "中国地区广告屏蔽列表", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "ClearURLs/Addon", "url": "https://github.com/ClearURLs/Addon", "description": "ClearURLs自动移除 URL 中的追踪元素", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "rime-auto-deploy", "url": "https://github.com/Mark24Code/rime-auto-deploy", "description": "Rime 输入法安装脚本", "month": "202603", "monthLabel": "2026.03", "category": "输入法"}, {"name": "Openclaw-Desktop", "url": "https://github.com/Luohao-Yan/Openclaw-Desktop", "description": "原生桌面端 Openclaw", "month": "202603", "monthLabel": "2026.03", "category": "AI / Agent 工具"}, {"name": "mengps/HuskarUI", "url": "https://github.com/mengps/HuskarUI", "description": "🎉 Ant-d UI-Kit for Qml", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "MyAgents", "url": "https://github.com/hAcKlyc/MyAgents", "description": "优雅、易用的通用 Agent 桌面端", "month": "202603", "monthLabel": "2026.03", "category": "AI / Agent 工具"}, {"name": "Kaku", "url": "https://github.com/tw93/Kaku", "description": "🎃一款快速、开箱即用的 AI 编码终端。", "month": "202603", "monthLabel": "2026.03", "category": "AI / Agent 工具"}, {"name": "we-mp-rss", "url": "https://github.com/rachelos/we-mp-rss", "description": "✨符合阅读习惯的微信公众号助手", "month": "202603", "monthLabel": "2026.03", "category": "媒体工具"}, {"name": "kodiak", "url": "https://github.com/chdsbd/kodiak", "description": "🔮自动更新和合并 GitHub PR 的机器人", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "pilipro", "url": "https://github.com/naaammme/pilipro", "description": "使用 Flutter 开发的 BiliBili 第三方客户端", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "JKVideo", "url": "https://github.com/tiajinsha/JKVideo", "description": "高颜值的第三方 B 站 React Native 客户端", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "Work_Review", "url": "https://github.com/wm94i/Work_Review", "description": "帮你自动记录一天中使用了哪些应用", "month": "202603", "monthLabel": "2026.03", "category": "桌面工具"}, {"name": "PiliNara", "url": "https://github.com/Starfallan/PiliNara", "description": "PiliPlus 的第三方 Fork 版本，做了一些自用改动", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "cryptomator", "url": "https://github.com/cryptomator/cryptomator", "description": "为你的云存储提供安全的客户端加密", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "Awesome-OpenClaw", "url": "https://github.com/EthanYolo01/Awesome-OpenClaw", "description": "OpenClaw 优质资源大合集", "month": "202603", "monthLabel": "2026.03", "category": "AI / Agent 工具"}, {"name": "zhashut/goread", "url": "https://github.com/zhashut/goread", "description": "本地电子书阅读设计的轻量级阅读应用", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "OneDroid", "url": "https://github.com/QingGeTech/OneDroid", "description": "OneDroid - 系统级 Android 全能工具箱", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "easy_tv_live", "url": "https://github.com/aiyakuaile/easy_tv_live", "description": "极简 TV App，一款轻量级 IPTV 播放器", "month": "202603", "monthLabel": "2026.03", "category": "媒体工具"}, {"name": "awesome-flutter-plugins", "url": "https://github.com/jahnli/awesome-flutter-plugins", "description": "🔥🔥 收集好用的 Flutter 插件", "month": "202603", "monthLabel": "2026.03", "category": "Awesome 列表"}, {"name": "NeatShift", "url": "https://github.com/BytexGrid/NeatShift", "description": "一个现代 Windows 文件组织工具，支持符号链接", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "flare-stack-blog", "url": "https://github.com/du2333/flare-stack-blog", "description": "基于 Cloudflare 生态的全栈现代化博客 CMS。", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "zzhorc/oneiro", "url": "https://github.com/zzhorc/oneiro", "description": "浮生梦 - 简约美观的自定义新标签页的浏览器扩展", "month": "202603", "monthLabel": "2026.03", "category": "桌面工具"}, {"name": "Rin", "url": "https://github.com/openRin/Rin", "description": "🌸通过由Cloudflare Workers、D1和R2支持的边缘原生博客", "month": "202603", "monthLabel": "2026.03", "category": "网络工具"}, {"name": "geekgeekrun", "url": "https://github.com/geekgeekrun/geekgeekrun", "description": "牛人快跑 - GeekGeekRun，求职找工作自动化工具", "month": "202603", "monthLabel": "2026.03", "category": "学习资源"}, {"name": "CloudPaste", "url": "https://github.com/ling-drag0n/CloudPaste", "description": "🌩️ Serverless 自托管的文件管理与文本分享工具/网盘", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "Crosstalk-Solutions/项目游牧者", "url": "https://github.com/Crosstalk-Solutions/project-nomad", "description": "是一款自给自足的离线生存计算机", "month": "202603", "monthLabel": "2026.03", "category": "编程开发"}, {"name": "PakePlus", "url": "https://github.com/Sjj1024/PakePlus", "description": "将任何网页/HTML/Vue/React等内容转为桌面和移动应用", "month": "202603", "monthLabel": "2026.03", "category": "桌面工具"}, {"name": "zhiyuan1i/adblock_list", "url": "https://github.com/zhiyuan1i/adblock_list", "description": "adblock_list 是一个致力于中文区广告过滤、隐私保护的快速迭代规则", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "quick-picture-viewer", "url": "https://github.com/ModuleArt/quick-picture-viewer", "description": "🖼️ 关于  🖼️ 轻量、多功能的Windows桌面图像查看器", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "OpenClawChineseTranslation", "url": "https://github.com/1186258278/OpenClawChineseTranslation", "description": "🦞 OpenClaw (Clawdbot/Moltbot) 汉化版", "month": "202603", "monthLabel": "2026.03", "category": "AI / Agent 工具"}, {"name": "Win11Debloat", "url": "https://github.com/Raphire/Win11Debloat", "description": "一个简单、轻量级的PowerShell脚本，允许你移除预装应用，禁用遥测，并进行各种修改", "month": "202603", "monthLabel": "2026.03", "category": "系统工具"}, {"name": "ai-cli-complete-notify", "url": "https://github.com/ZekerTop/ai-cli-complete-notify", "description": "面向 Claude code/Codex/Gemini 的多通道AI CLI 任务完成提醒", "month": "202603", "monthLabel": "2026.03", "category": "AI / Agent 工具"}, {"name": "AlexsJones/llmfit", "url": "https://github.com/AlexsJones/llmfit", "description": "数百个模型和供应商查询工具，一个命令即可查找硬件上运行的设备", "category": "AI / Agent 工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "mm7894215/TokenTracker", "url": "https://github.com/mm7894215/TokenTracker", "description": "追踪 Claude Code、Codex、Cursor、Gemini、Kiro 等代码编辑器的Token使用情况，本地优先零配置", "category": "AI / Agent 工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "alchaincyf/nuwa-skill", "url": "https://github.com/alchaincyf/nuwa-skill", "description": "你想蒸馏的下一个员工", "category": "AI / Agent 工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "zhukunpenglinyutong/desktop-cc-gui", "url": "https://github.com/zhukunpenglinyutong/desktop-cc-gui", "description": "CC GUI 客户端，专为开发者打造的 VibeCoding 平台", "category": "AI / Agent 工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "farion1231/cc-switch", "url": "https://github.com/farion1231/cc-switch", "description": "跨平台桌面 All-in-One 助手工具，支持 Claude Code、Codex、OpenCode、openclaw 等", "category": "AI / Agent 工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "AFunc-OPC/Skiller", "url": "https://github.com/AFunc-OPC/Skiller", "description": "跨平台 Skill 管理工具", "category": "AI / Agent 工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "open-webui/desktop", "url": "https://github.com/open-webui/desktop", "description": "Open WebUI 桌面客户端", "category": "AI / Agent 工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "voideditor/void", "url": "https://github.com/voideditor/void", "description": "代码编辑器", "category": "编程开发", "month": "202604", "monthLabel": "2026.04"}, {"name": "imanoop7/Ollama-OCR", "url": "https://github.com/imanoop7/Ollama-OCR", "description": "基于 Ollama 的 OCR 识别工具", "category": "编程开发", "month": "202604", "monthLabel": "2026.04"}, {"name": "JayBizzle/Crawler-Detect", "url": "https://github.com/JayBizzle/Crawler-Detect", "description": "PHP 爬虫检测库，通过用户代理识别机器人、爬虫和蜘蛛", "category": "编程开发", "month": "202604", "monthLabel": "2026.04"}, {"name": "Gridea-Pro/gridea-pro", "url": "https://github.com/Gridea-Pro/gridea-pro", "description": "静态博客写作客户端", "category": "编程开发", "month": "202604", "monthLabel": "2026.04"}, {"name": "BingyanStudio/LapisCV", "url": "https://github.com/BingyanStudio/LapisCV", "description": "在 VSCode / Typora / Obsidian 上用 Markdown 轻松创建简历", "category": "编程开发", "month": "202604", "monthLabel": "2026.04"}, {"name": "Bistutu/FluentRead", "url": "https://github.com/Bistutu/FluentRead", "description": "革命性的浏览器开源翻译插件", "category": "编程开发", "month": "202604", "monthLabel": "2026.04"}, {"name": "AmintaCCCP/GithubStarsManager", "url": "https://github.com/AmintaCCCP/GithubStarsManager", "description": "GitHub 星标仓库管理应用", "category": "编程开发", "month": "202604", "monthLabel": "2026.04"}, {"name": "owu/wsl-dashboard", "url": "https://github.com/owu/wsl-dashboard", "description": "高性能轻量级的 WSL 实例管理面板", "category": "系统工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "eq1024/WinPaste", "url": "https://github.com/eq1024/WinPaste", "description": "快速轻量功能强大的 Windows 剪贴板增强工具", "category": "系统工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "edumucelli/docking", "url": "https://github.com/edumucelli/docking", "description": "轻量级功能丰富的 Linux Dock", "category": "系统工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "2977094657/ScreenMemo", "url": "https://github.com/2977094657/ScreenMemo", "description": "本地运行的智能截屏备忘与检索工具", "category": "系统工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "Johnserf-Seed/f2", "url": "https://github.com/Johnserf-Seed/f2", "description": "多平台作品下载与接口数据处理工具", "category": "媒体下载", "month": "202604", "monthLabel": "2026.04"}, {"name": "LifeArchiveProject/BiliHistoryFrontend", "url": "https://github.com/LifeArchiveProject/BiliHistoryFrontend", "description": "B站历史记录下载，支持视频、动态、收藏夹，生成年度总结", "category": "媒体下载", "month": "202604", "monthLabel": "2026.04"}, {"name": "joevess/IPTV", "url": "https://github.com/joevess/IPTV", "description": "直播源抓取，自动整合多种直播源", "category": "媒体下载", "month": "202604", "monthLabel": "2026.04"}, {"name": "elementdavv/internet_archive_downloader", "url": "https://github.com/elementdavv/internet_archive_downloader", "description": "Internet Archive 下载器", "category": "媒体下载", "month": "202604", "monthLabel": "2026.04"}, {"name": "mahonzhan/awesome-coding-plan", "url": "https://github.com/mahonzhan/awesome-coding-plan", "description": "各厂家 Coding Plan 实际价值对比", "category": "资源收集", "month": "202604", "monthLabel": "2026.04"}, {"name": "kyrolabs/awesome-agents", "url": "https://github.com/kyrolabs/awesome-agents", "description": "超棒的 AI 代理列表", "category": "资源收集", "month": "202604", "monthLabel": "2026.04"}, {"name": "rafska/Awesome-local-LLM", "url": "https://github.com/rafska/Awesome-local-LLM", "description": "精选的优秀本地大语言模型平台、工具、实践和资源列表", "category": "资源收集", "month": "202604", "monthLabel": "2026.04"}, {"name": "xixu-me/awesome-persona-distill-skills", "url": "https://github.com/xixu-me/awesome-persona-distill-skills", "description": "围绕人、关系、纪念画面和方法论视点的职业技能集锦清单", "category": "资源收集", "month": "202604", "monthLabel": "2026.04"}, {"name": "jamez-bondos/awesome-gpt4o-images", "url": "https://github.com/jamez-bondos/awesome-gpt4o-images", "description": "GPT-4o 与 gpt-image-1 生成图像与提示词精选合集", "category": "资源收集", "month": "202604", "monthLabel": "2026.04"}, {"name": "awesome-selfhosted/awesome-selfhosted", "url": "https://github.com/awesome-selfhosted/awesome-selfhosted", "description": "可在你自己服务器上托管的自由软件网络服务和应用列表", "category": "资源收集", "month": "202604", "monthLabel": "2026.04"}, {"name": "AprDeci/bili-music", "url": "https://github.com/AprDeci/bili-music", "description": "B站源的音乐App", "category": "媒体工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "waylyrics/waylyrics", "url": "https://github.com/waylyrics/waylyrics", "description": "桌面歌词展示的毛茸茸方式", "category": "媒体工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "GuMengYu/music-you", "url": "https://github.com/GuMengYu/music-you", "description": "美观简约的 Material Design 3 风格 PC 音乐播放器", "category": "媒体工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "027xiguapi/pear-rec", "url": "https://github.com/027xiguapi/pear-rec", "description": "用于录制和截图的工具", "category": "桌面工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "lanxiuyun/PasteDrop", "url": "https://github.com/lanxiuyun/PasteDrop", "description": "保存剪切板图片为文件", "category": "桌面工具", "month": "202604", "monthLabel": "2026.04"}, {"name": "shenmin/cassotis-ime", "url": "https://github.com/shenmin/cassotis-ime", "description": "基于 Delphi 的实验性中文拼音输入法", "category": "输入法", "month": "202604", "monthLabel": "2026.04"}, {"name": "zhangjh/suyan-site", "url": "https://github.com/zhangjh/suyan-site", "description": "素言输入法", "category": "输入法", "month": "202604", "monthLabel": "2026.04"}, {"name": "C5H12O5/TextGO", "url": "https://github.com/C5H12O5/TextGO", "description": "可定制文本选择弹窗工具", "category": "输入法", "month": "202604", "monthLabel": "2026.04"}, {"name": "Lingyan000/fluxdo", "url": "https://github.com/Lingyan000/fluxdo", "description": "Linux.do 第三方客户端", "category": "社交 / 社区", "month": "202604", "monthLabel": "2026.04"}, {"name": "anghunk/cwd", "url": "https://github.com/anghunk/cwd", "description": "基于 Cloudflare Workers 的评论系统", "category": "社交 / 社区", "month": "202604", "monthLabel": "2026.04"}, {"name": "maillab/cloud-mail", "url": "https://github.com/maillab/cloud-mail", "description": "基于 Cloudflare 的邮箱服务", "category": "社交 / 社区", "month": "202604", "monthLabel": "2026.04"}, {"name": "Konsheng/Sensitive-lexicon", "url": "https://github.com/Konsheng/Sensitive-lexicon", "description": "持续更新的中文敏感词库", "category": "其他", "month": "202604", "monthLabel": "2026.04"}, {"name": "tiddly-gittly/TidGi-Desktop", "url": "https://github.com/tiddly-gittly/TidGi-Desktop", "description": "注重隐私、自动化、自由部署的知识管理桌面笔记应用，支持自动备份", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "study8677/Readme.skill", "url": "https://github.com/study8677/Readme.skill", "description": "Claude Code / Codex CLI 专用 skill：自动生成对外可分享、脱敏的 AI-Native 开发者 README", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "xingkongliang/skills-manager", "url": "https://github.com/xingkongliang/skills-manager", "description": "统一管理所有 AI 编码工具的 Skill 配置和安装", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "WenyuChiou/awesome-agentic-ai-zh", "url": "https://github.com/WenyuChiou/awesome-agentic-ai-zh", "description": "AI Agent 中文学习资源地图，汇总各类智能体学习资料", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "gugug168/cute-claude-hooks", "url": "https://github.com/gugug168/cute-claude-hooks", "description": "Claude Code 界面汉化工具，附带实用的自定义 Hooks 集合", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "Gitlawb/openclaude", "url": "https://github.com/Gitlawb/openclaude", "description": "一个轻量 Claude 客户端，随处运行，支持多种使用场景", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "XingYu-Zhong/DeepSeek-GUI", "url": "https://github.com/XingYu-Zhong/DeepSeek-GUI", "description": "面向开发者的 DeepSeek 本地桌面工作台，包含 Code 和 Write 双模式，支持项目级工作区、Skill/MCP 管理、连接手机和定时任务", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "esengine/DeepSeek-Reasonix", "url": "https://github.com/esengine/DeepSeek-Reasonix", "description": "专为 DeepSeek 优化的终端 AI 编码代理，围绕前缀缓存稳定性设计，支持长会话低 token 消耗", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "danny-avila/LibreChat", "url": "https://github.com/danny-avila/LibreChat", "description": "功能增强的 ChatGPT 克隆，支持多模型切换、Agent、MCP、代码解释器、多用户认证，可自托管", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "siteboon/claudecodeui", "url": "https://github.com/siteboon/claudecodeui", "description": "在移动端和网页上通过 CloudCLI 使用 Claude Code、Cursor CLI 或 Codex", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "ZgDaniel/cc-web", "url": "https://github.com/ZgDaniel/cc-web", "description": "通过浏览器远程使用 Claude Code 的 Web 工具", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "xintaofei/codeg", "url": "https://github.com/xintaofei/codeg", "description": "协作式多 Agent AI 编码工作区，可聚合 Claude Code、Codex、Gemini CLI 等多个会话", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "AbdoKnbGit/tau", "url": "https://github.com/AbdoKnbGit/tau", "description": "统一管理所有开发代理的集成工具", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "Alishahryar1/free-claude-code", "url": "https://github.com/Alishahryar1/free-claude-code", "description": "免费使用 Claude Code 的代理工具，支持终端、VS Code 扩展和 Discord/Telegram 机器人", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "DevAgentForge/Open-Claude-Cowork", "url": "https://github.com/DevAgentForge/Open-Claude-Cowork", "description": "Claude Cowork 的开源替代方案，桌面 AI 协作助手，支持编程、文件管理和各类任务", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "skillsgate/skillsgate", "url": "https://github.com/skillsgate/skillsgate", "description": "AI Agent Skill 可视化管理器，桌面应用和 TUI 双模式，支持 20+ 代理和 skills.sh 发现", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "rtk-ai/rtk", "url": "https://github.com/rtk-ai/rtk", "description": "CLI 代理工具，减少 LLM 到常见开发命令的 Token 消耗达 60%-90%", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "zhu1090093659/deepseek-pp", "url": "https://github.com/zhu1090093659/deepseek-pp", "description": "为 DeepSeek 网页版注入类原生工具调用能力，扩展其功能边界", "category": "AI / Agent 工具", "month": "202605", "monthLabel": "2026.05"}, {"name": "NanmiCoder/cc-haha", "url": "https://github.com/NanmiCoder/cc-haha", "description": "Claude Code 泄漏源码的本地可运行版本，供学习研究参考", "category": "编程开发", "month": "202605", "monthLabel": "2026.05"}, {"name": "freestylefly/CodexGuide", "url": "https://github.com/freestylefly/CodexGuide", "description": "面向全球初学者、创作者、开发者与团队的 Codex 实践指南", "category": "编程开发", "month": "202605", "monthLabel": "2026.05"}, {"name": "murongg/markra", "url": "https://github.com/murongg/markra", "description": "带有原生 AI 辅助功能的所见即所得 Markdown 编辑器", "category": "编程开发", "month": "202605", "monthLabel": "2026.05"}, {"name": "lewislulu/html-ppt-skill", "url": "https://github.com/lewislulu/html-ppt-skill", "description": "HTML PPT Studio，用 HTML 制作专业演示文稿的 Skill", "category": "编程开发", "month": "202605", "monthLabel": "2026.05"}, {"name": "mokeyjay/costrict-router", "url": "https://github.com/mokeyjay/costrict-router", "description": "第三方的 CoStrict 接口转发工具，方便 API 管理和路由", "category": "编程开发", "month": "202605", "monthLabel": "2026.05"}, {"name": "browser-use/terminal", "url": "https://github.com/browser-use/terminal", "description": "基于 Rust 的浏览器自动化终端工具，可在终端中完成浏览器任务操作", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "jessewallace/zync", "url": "https://github.com/jessewallace/zync", "description": "跨机器同步 Zen Browser 浏览器配置文件的工具，支持手动和 GitHub 自动同步", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "zhao-wuyan/directory-migration-tool", "url": "https://github.com/zhao-wuyan/directory-migration-tool", "description": "使用符号链接迁移大型目录的 Windows 工具，无需移动文件即可重组目录结构", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "SummerRay160/LumiShift", "url": "https://github.com/SummerRay160/LumiShift", "description": "轻量级屏幕亮度与 Gamma 校正工具，保护视力", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "wiltodelta/remove-ai-watermarks", "url": "https://github.com/wiltodelta/remove-ai-watermarks", "description": "命令行和库工具，去除图像中的可见（Gemini）和不可见（SynthID、C2PA、Exif）AI 水印", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "itsfatduck/optimizerDuck", "url": "https://github.com/itsfatduck/optimizerDuck", "description": "免费开源的 Windows 优化工具，兼顾性能提升、隐私保护和界面简洁", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "Cateners/tiny_computer", "url": "https://github.com/Cateners/tiny_computer", "description": "让安卓 9 以上 arm64 设备变身\"PC 应用引擎\"的平替方案", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "funAgent/ai-bubu", "url": "https://github.com/funAgent/ai-bubu", "description": "桌面宠物应用，实时追踪和展示你的 AI 编码活动状态", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "rullerzhou-afk/clawd-on-desk", "url": "https://github.com/rullerzhou-afk/clawd-on-desk", "description": "像素风格桌面宠物，监视 Claude Code 的工作状态", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "16Mu/classTime", "url": "https://github.com/16Mu/classTime", "description": "\"时课\"——智能校园课表管理应用，方便学生管理课程安排", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "uniclipboard/uniclipboard", "url": "https://github.com/uniclipboard/uniclipboard", "description": "跨设备实时剪贴板同步工具，实现多设备间的复制粘贴互通", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "Achilng/floral-notepaper", "url": "https://github.com/Achilng/floral-notepaper", "description": "\"花笺\"——轻量优雅的跨平台桌面便签工具，支持 Markdown 编辑与实时预览", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "ihmily/proxy-guide", "url": "https://github.com/ihmily/proxy-guide", "description": "从零基础到精通的科学上网技术完整教程", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "boratanrikulu/gecit", "url": "https://github.com/boratanrikulu/gecit", "description": "DPI 绕过工具，帮助突破网络深度包检测限制", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "opskat/opskat", "url": "https://github.com/opskat/opskat", "description": "开源的 AI 优先桌面应用，用于管理远程基础设施，支持自然语言操作 SSH 服务器、数据库、Redis、MongoDB 和 Kafka", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "QingJ01/Pebble", "url": "https://github.com/QingJ01/Pebble", "description": "小巧但漂亮的电子邮件客户端，追求极简设计", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "nnecec/xb", "url": "https://github.com/nnecec/xb", "description": "让微博界面更像 X（Twitter）的 Chrome 插件，简化微博体验", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "shawnxie94/readrops-lumina", "url": "https://github.com/shawnxie94/readrops-lumina", "description": "Android RSS 阅读器，基于 Readrops 并集成 Lumina 采集能力", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "shawnxie94/infinitum", "url": "https://github.com/shawnxie94/infinitum", "description": "基于 RSS 的资讯聚合工作台，一站式信息管理", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "HIM049/BADownloaderUI", "url": "https://github.com/HIM049/BADownloaderUI", "description": "使用 Wails 框架重构的下载工具，全新界面体验", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "MoonTechLab/Selene-TV", "url": "https://github.com/MoonTechLab/Selene-TV", "description": "以 MoonTV v100 / Helios 为后端的 Android TV 客户端", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "hieunc229/mailflare", "url": "https://github.com/hieunc229/mailflare", "description": "基于 Cloudflare 的自定义域名邮件客户端", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "can4hou6joeng4/boss-agent-cli", "url": "https://github.com/can4hou6joeng4/boss-agent-cli", "description": "AI Agent 优先的命令行工具，面向 BOSS 直聘平台的自动化求职", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "localhost-cc/Freedomain", "url": "https://github.com/localhost-cc/Freedomain", "description": "localhost.cc 免费域名平台，提供免费域名注册服务", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "zilong7728/Collect-IPTV", "url": "https://github.com/zilong7728/Collect-IPTV", "description": "IPTV 节目源收集工具，整合多种直播源", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "jellyfin/jellyfin", "url": "https://github.com/jellyfin/jellyfin", "description": "自由开源的媒体管理系统，可自托管管理和串流个人影音库", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "mimusic-org/mimusic", "url": "https://github.com/mimusic-org/mimusic", "description": "轻量私有化音乐服务，自建个人音乐库", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "llt22/talkio", "url": "https://github.com/llt22/talkio", "description": "本地优先的多 AI 群聊桌面应用，支持多个 AI 同时对话", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "Leey21/awesome-ai-research-writing", "url": "https://github.com/Leey21/awesome-ai-research-writing", "description": "提升 AI 科研写作水平的资源合集，包含翻译、润色、去 AI 味等实战 Prompt 模板", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "Norman-bury/research-writing-skill", "url": "https://github.com/Norman-bury/research-writing-skill", "description": "科研写作助手 Skill，提供从头脑风暴到投稿前自审的完整论文写作流程", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "modelscope/FunASR", "url": "https://github.com/modelscope/FunASR", "description": "工业级语音识别工具包，支持多语言和多种场景", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "SIXIANGGUO/cc-note-ops", "url": "https://github.com/SIXIANGGUO/cc-note-ops", "description": "将 Obsidian 笔记变成 Claude Code 可操作内容工作台的插件，支持一键公众号改写、小红书拆条、RSS 日报等", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "volsifly/ibus_llm_pinyin_input", "url": "https://github.com/volsifly/ibus_llm_pinyin_input", "description": "基于大语言模型的 ibus 拼音输入法，利用 AI 提升输入体验", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "Aimino-Tech/opendocswork-mcp", "url": "https://github.com/Aimino-Tech/opendocswork-mcp", "description": "基于 Rust 的 Office 文档处理 MCP 服务器，亚毫秒级处理 Excel、Word、PowerPoint 和 PDF", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "Luoyacheng/legado", "url": "https://github.com/Luoyacheng/legado", "description": "开源阅读应用 Legado，支持多种电子书格式", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}, {"name": "poleHansen/baibaiAIGC", "url": "https://github.com/poleHansen/baibaiAIGC", "description": "中文论文去 AI 味工具，支持多轮降低 AIGC 痕迹，保留原文结构和事实", "category": "Shell / 终端", "month": "202605", "monthLabel": "2026.05"}];
+const MONTH_STATS = [{"id": "202510", "label": "2025.10", "count": 20}, {"id": "202511", "label": "2025.11", "count": 19}, {"id": "202512", "label": "2025.12", "count": 40}, {"id": "202601", "label": "2026.01", "count": 23}, {"id": "202602", "label": "2026.02", "count": 26}, {"id": "202603", "label": "2026.03", "count": 47}, {"id": "202604", "label": "2026.04", "count": 40}, {"id": "202605", "label": "2026.05", "count": 59}];
+const ALL_CATEGORIES = ["AI / Agent 工具", "Awesome 列表", "Shell / 终端", "其他", "媒体下载", "媒体工具", "学习资源", "桌面工具", "浏览器扩展", "社交 / 社区", "系统工具", "编程开发", "网络工具", "资源收集", "输入法"];
+
+// ============ STATE ============
+let currentMonth = "202605";
+let currentSearch = "";
+let currentCategory = "";
+
+// ============ RENDER STATS ============
+function renderStats() {
+  const bar = document.getElementById("statsBar");
+  const totalMonths = MONTH_STATS.filter(m => m.count > 0).length;
+  const maxCount = Math.max(...MONTH_STATS.map(m => m.count));
+  const busiest = MONTH_STATS.find(m => m.count === maxCount);
+  bar.innerHTML = `
+    <div class="stat-card"><div class="stat-number">${PROJECTS.length}</div><div class="stat-label">总项目</div></div>
+    <div class="stat-card"><div class="stat-number">${totalMonths}</div><div class="stat-label">收藏月份</div></div>
+    <div class="stat-card"><div class="stat-number">${busiest ? busiest.count : 0}</div><div class="stat-label">最多·${busiest ? busiest.label : ''}</div></div>
+    <div class="stat-card"><div class="stat-number">${ALL_CATEGORIES.length}</div><div class="stat-label">分类数</div></div>
+  `;
+}
+
+// ============ RENDER TABS ============
+function renderTabs() {
+  const container = document.getElementById("tabs");
+  let html = `<button class="tab-btn ${currentMonth === 'all' ? 'active' : ''}" onclick="switchMonth('all')">全部 <span class="tab-count">${PROJECTS.length}</span></button>`;
+  MONTH_STATS.forEach(m => {
+    if (m.count === 0) return;
+    html += `<button class="tab-btn ${m.id === currentMonth ? 'active' : ''}" onclick="switchMonth('${m.id}')">${m.label} <span class="tab-count">${m.count}</span></button>`;
+  });
+  container.innerHTML = html;
+}
+
+function switchMonth(month) {
+  currentMonth = month;
+  renderTabs();
+  renderGrid();
+  document.getElementById("backTop").click();
+}
+
+// ============ RENDER CATEGORY FILTER ============
+function renderCategoryFilter() {
+  const select = document.getElementById("categoryFilter");
+  ALL_CATEGORIES.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    select.appendChild(opt);
+  });
+}
+
+// ============ RENDER CARD GRID ============
+function getFilteredProjects() {
+  return PROJECTS.filter(p => {
+    if (currentMonth !== "all" && p.month !== currentMonth) return false;
+    if (currentCategory && p.category !== currentCategory) return false;
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      const searchable = (p.name + " " + p.description + " " + (p.category || "")).toLowerCase();
+      if (!searchable.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderGrid() {
+  const filtered = getFilteredProjects();
+  const grid = document.getElementById("projectGrid");
+  const count = document.getElementById("gridCount");
+
+  count.textContent = `显示 ${filtered.length} / ${PROJECTS.length} 个项目`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span><p>没有找到匹配的项目 😅</p></div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => {
+    const nameParts = p.name.split("/");
+    const owner = nameParts.length > 1 ? nameParts[0] : "";
+    const repoName = nameParts.length > 1 ? nameParts.slice(1).join("/") : p.name;
+
+    return `
+      <div class="card">
+        <div class="card-top">
+          <a href="${p.url}" target="_blank" rel="noopener" class="card-name" title="${html(p.url)}">
+            ${owner ? `<span class="owner">${owner}</span>/${repoName}` : p.name}
+          </a>
+          <a href="${p.url}" target="_blank" rel="noopener" class="card-link" title="在 GitHub 中打开">↗</a>
+        </div>
+        ${p.description ? `<div class="card-desc">${html(p.description)}</div>` : ''}
+        <div class="card-footer">
+          ${p.category ? `<span class="tag">${html(p.category)}</span>` : ''}
+          <span class="tag tag-month">${p.monthLabel}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function html(s) {
+  if (!s) return "";
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ============ EVENT LISTENERS ============
+document.getElementById("searchInput").addEventListener("input", (e) => {
+  currentSearch = e.target.value;
+  renderGrid();
+});
+
+document.getElementById("categoryFilter").addEventListener("change", (e) => {
+  currentCategory = e.target.value;
+  renderGrid();
+});
+
+// ============ THEME TOGGLE ============
+const themeToggle = document.getElementById("themeToggle");
+themeToggle.addEventListener("click", () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute("data-theme") === "dark";
+  html.setAttribute("data-theme", isDark ? "light" : "dark");
+  themeToggle.textContent = isDark ? "🌙" : "☀️";
+  localStorage.setItem("theme", isDark ? "light" : "dark");
+});
+
+// Restore theme
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
+  document.documentElement.setAttribute("data-theme", "dark");
+  themeToggle.textContent = "☀️";
+}
+
+// ============ BACK TO TOP VISIBILITY ============
+window.addEventListener("scroll", () => {
+  const btn = document.getElementById("backTop");
+  btn.classList.toggle("visible", window.scrollY > 300);
+});
+
+// ============ INIT ============
+renderStats();
+renderTabs();
+renderCategoryFilter();
+renderGrid();
+</script>
+</body>
+</html>
