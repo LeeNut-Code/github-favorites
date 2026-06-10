@@ -1,74 +1,36 @@
 # 🌰 栗子的 GitHub 收藏夹
 
-个人 GitHub 开源项目收藏展示站，按月归档收藏的优质开源项目。
+2025 年 10 月起按月收录 GitHub 优质开源项目，截至 2026 年 5 月共 **274 个**，涵盖 15 个分类。
 
-## 目录结构
+## 📊 各月统计
+
+| 月份 | 数量 | 主要类别 |
+|------|:----:|----------|
+| 2025.10 | 20 | AppImage、TV 工具、Awesome 列表 |
+| 2025.11 | 19 | Shell 终端工具 |
+| 2025.12 | 40 | 音乐播放器、桌面应用 |
+| 2026.01 | 23 | RSS 工具、微信相关应用 |
+| 2026.02 | 26 | 剪贴板工具、输入流转、系统优化 |
+| 2026.03 | 47 | Claude Code 生态、Agent 工具 |
+| 2026.04 | 40 | AI Agent 工具、输入法、博客系统 |
+| 2026.05 | 59 | Claude Code 工具链 |
+
+## 🏷️ 分类范围
+
+AI / Agent 工具、编程开发、系统工具、Shell / 终端、媒体工具、桌面工具、网络工具、社交 / 社区、Awesome 列表、输入法、浏览器扩展、学习资源等。
+
+## 👀 浏览方式
+
+直接打开 `website/index.html` 即可在浏览器中查看。支持按月切换、按分类筛选、关键词搜索。各月目录下的 `README.md` 包含按分类整理的中文清单。
+
+## 🔧 维护流程
 
 ```
-github_favorites/
-├── website/               ← 生成的静态网站（双击 index.html 即可浏览）
-│   └── index.html
-├── generate_website.py    ← 网站数据生成脚本
-├── 202510/                ← 各月收藏数据
-│   └── bookmarks.html
-├── 202511/
-│   └── bookmarks.html
-├── 202512/
-│   └── bookmarks.html
-├── 202601/
-│   └── bookmarks.html
-├── 202602/
-│   └── bookmarks.html
-├── 202603/
-│   └── bookmarks.html
-├── 202604/
-│   ├── bookmarks.html
-│   └── README.md          ← 含分类和中文描述的月度清单
-├── 202605/
-│   ├── bookmarks.html
-│   └── README.md
-├── extract_favorites.py   ← 收藏提取工具
-├── extract_monthly.py     ← 按月拆分工具
-├── .gitignore
-└── README.md
+收藏项目 → 导出书签 → 按月拆分 → 整理分类 → 生成网站 → 推送到 GitHub Pages
 ```
 
-## 快速使用
+数据提取和网站生成均由 Python 脚本处理：
+- `generate_website.py`——读取书签数据，自动归类，生成完整网站
+- `extract_favorites.py`、`extract_monthly.py`——从浏览器书签提取和按月拆分
 
-1. **浏览收藏**：直接打开 `website/index.html`
-2. **更新数据**：添加新月份目录后运行：
-   ```bash
-   python3 generate_website.py
-   ```
-3. **部署到网络**：将 `website/` 目录上传到 GitHub Pages / Cloudflare Pages / Vercel 等静态托管平台
-
-## 数据概览
-
-| 月份 | 项目数 |
-|------|-------|
-| 2025.10 | 20 |
-| 2025.11 | 19 |
-| 2025.12 | 40 |
-| 2026.01 | 23 |
-| 2026.02 | 26 |
-| 2026.03 | 47 |
-| 2026.04 | 40 |
-| 2026.05 | 59 |
-| **总计** | **274** |
-
-涵盖分类：AI / Agent 工具、编程开发、系统工具、桌面工具、网络工具、媒体工具、Awesome 列表、输入法、浏览器扩展、学习资源等 15 个类别。
-
-## 更新流程
-
-1. 通过浏览器收藏新的 GitHub 项目
-2. 导出书签到 `书签_年月日.html`
-3. 运行 `extract_favorites.py` 提取收藏
-4. 运行 `extract_monthly.py` 按月拆分到对应目录
-5. 可选：在月度目录下编写 `README.md` 添加详细分类和描述
-6. 运行 `python3 generate_website.py` 更新网站
-
-## 技术栈
-
-- **前端**：纯 HTML + CSS + JavaScript（单页应用，零依赖）
-- **数据处理**：Python 3（数据提取、自动分类、网站生成）
-- **部署**：支持任何静态托管（GitHub Pages / Cloudflare Pages / Vercel）
+网站为纯 HTML/CSS/JS，零依赖，托管于 GitHub Pages和Cloudflare pages。
