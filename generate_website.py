@@ -18,12 +18,19 @@ BASE_DIR = Path(__file__).parent
 WEBSITE_DIR = BASE_DIR / "website"
 
 MONTH_LABELS = {
-    "202510": "2025.10", "202511": "2025.11", "202512": "2025.12",
-    "202601": "2026.01", "202602": "2026.02", "202603": "2026.03",
-    "202604": "2026.04", "202605": "2026.05",
+    "202510": "2025.10",
+    "202511": "2025.11",
+    "202512": "2025.12",
+    "202601": "2026.01",
+    "202602": "2026.02",
+    "202603": "2026.03",
+    "202604": "2026.04",
+    "202605": "2026.05",
+    "202606": "2026.06",
 }
 
 MONTH_ORDER = sorted(MONTH_LABELS.keys())
+
 
 def parse_bookmark_name(text):
     """从 bookmark 链接文本提取项目名和描述"""
@@ -39,9 +46,9 @@ def parse_bookmark_name(text):
 
 def extract_github_repo(url):
     """从 GitHub URL 提取 owner/repo"""
-    match = re.search(r'github\.com/([^/]+/[^/#?]+)', url)
+    match = re.search(r"github\.com/([^/]+/[^/#?]+)", url)
     if match:
-        return match.group(1).rstrip('/')
+        return match.group(1).rstrip("/")
     return None
 
 
@@ -49,10 +56,7 @@ def parse_bookmarks_html(filepath):
     """从 bookmarks.html 提取项目列表"""
     projects = []
     content = filepath.read_text("utf-8", errors="replace")
-    pattern = re.compile(
-        r'<A\s+HREF="([^"]+)"[^>]*>([^<]+)</A>',
-        re.IGNORECASE
-    )
+    pattern = re.compile(r'<A\s+HREF="([^"]+)"[^>]*>([^<]+)</A>', re.IGNORECASE)
     for match in pattern.finditer(content):
         url = match.group(1).strip()
         link_text = match.group(2).strip()
@@ -69,11 +73,13 @@ def parse_bookmarks_html(filepath):
             if not desc and repo_full:
                 name = repo_full
                 desc = link_text
-            projects.append({
-                "name": name or repo_full or link_text,
-                "url": url,
-                "description": desc or "",
-            })
+            projects.append(
+                {
+                    "name": name or repo_full or link_text,
+                    "url": url,
+                    "description": desc or "",
+                }
+            )
     return projects
 
 
@@ -86,12 +92,12 @@ def parse_readme_categorized(filepath):
     lines = content.split("\n")
     for i, line in enumerate(lines):
         # 匹配分类标题: "### AI工具"
-        cat_match = re.match(r'^###\s+(.+)', line)
+        cat_match = re.match(r"^###\s+(.+)", line)
         if cat_match:
             current_category = cat_match.group(1).strip()
             continue
         # 匹配项目: "- [name](url)\n  描述"
-        proj_match = re.match(r'-\s+\[([^\]]+)\]\(([^)]+)\)', line)
+        proj_match = re.match(r"-\s+\[([^\]]+)\]\(([^)]+)\)", line)
         if proj_match:
             name = proj_match.group(1).strip()
             url = proj_match.group(2).strip()
@@ -106,12 +112,14 @@ def parse_readme_categorized(filepath):
                 else:
                     break
             description = " ".join(desc_lines) if desc_lines else ""
-            projects.append({
-                "name": name,
-                "url": url,
-                "description": description,
-                "category": current_category,
-            })
+            projects.append(
+                {
+                    "name": name,
+                    "url": url,
+                    "description": description,
+                    "category": current_category,
+                }
+            )
     return projects
 
 
@@ -164,72 +172,278 @@ MANUAL_CATEGORIES = {
 
 
 CATEGORY_RULES = [
-    ("AI / Agent 工具", [
-        "ai", "llm", "agent", "deepseek", "claude", "gpt", "chat", "prompt", "token",
-        "大模型", "人工智能", "智能体", "ai-", "-ai",
-        "llama", "ollama", "openai", "gemini", "codex", "cursor",
-        "nanobot", "openclaw",
-    ]),
-    ("编程开发", [
-        "editor", "ide", "sdk", "api", "framework", "library", "package",
-        "rust", "python", "typescript", "javascript", "npm", "编译器",
-        "template", "starter", "boilerplate", "markdown", "记事本",
-        "emacs", "vim", "vscode", "git", "pr", "commit", "blog",
-        "cms", "font", "字体", "monospace", "qml", "ui-kit",
-        "翻译", "translate", "ant-d", "crawler", "爬虫",
-        "rpa", "web自动化", "日历", "备份",
-        "fork", "第三方", "holiday", "节假日",
-        "加密", "crypto", "shark", "speed", "速度",
-        "离线", "survival", "tshark", "nginx", "端口",
-        "port", "serverbox",
-    ]),
-    ("桌面工具", [
-        "desktop", "剪贴板", "便签", "粘贴", "clipboard", "note", "便签",
-        "屏幕", "截图", "screenshot", "pet", "宠物", "压缩", "鼠标",
-        "图床", "日历", "时钟", "颜色", "color", "picker",
-        "新标签页", "网页.*app", "web-to-app", "pake", "输入流转",
-        "压缩软件", "画中画",
-    ]),
-    ("系统工具", [
-        "系统", "优化", "清理", "性能", "管理", "system", "utility",
-        "windows", "macos", "linux", "优化", "清理", "tool",
-        "监控", "monitor", "硬件", "wsl", "distro", "引导",
-        "grub", "powershell", "debloat", "emoji", "进程",
-        "ad", "广告", "hosts", "换源",
-        "自托管", "托管", "panel",
-    ]),
-    ("媒体工具", [
-        "player", "播放器", "music", "音乐", "video", "视频",
-        "iptv", "电视", "media", "下载器", "download", "媒体",
-        "jellyfin", "影视", "bilibili", "bili", "画中画",
-        "rss", "feed", "pixiv", "直播", "蓝奏云",
-        "一起看", "synctv",
-    ]),
-    ("Awesome 列表", [
-        "awesome", "精选", "资源大全", "合集", "collection", "list",
-        "awesome-", "精选的",
-    ]),
-    ("网络工具", [
-        "proxy", "dpi", "vpn", "ssh", "网络", "代理", "科学上网",
-        "network", "bypass", "防火墙", "订阅转换", "转发",
-        "dns", "cloudflare", "cdn", "服务器",
-    ]),
-    ("浏览器扩展", [
-        "chrome", "extension", "插件", "bookmarklet", "微博", "brave",
-        "浏览器", "superium",
-    ]),
-    ("输入法", [
-        "输入法", "拼音", "ime", "ibus",
-    ]),
-    ("学习资源", [
-        "教程", "学习", "课程", "guide", "tutorial", "book",
-        "入门", "指南", "实践", "数学", "security", "网络安全",
-        "面试", "求职",
-    ]),
-    ("社交 / 社区", [
-        "聊天", "im", "微信", "telegram", "端到端", "mixgram",
-        "elementary",
-    ]),
+    (
+        "AI / Agent 工具",
+        [
+            "ai",
+            "llm",
+            "agent",
+            "deepseek",
+            "claude",
+            "gpt",
+            "chat",
+            "prompt",
+            "token",
+            "大模型",
+            "人工智能",
+            "智能体",
+            "ai-",
+            "-ai",
+            "llama",
+            "ollama",
+            "openai",
+            "gemini",
+            "codex",
+            "cursor",
+            "nanobot",
+            "openclaw",
+        ],
+    ),
+    (
+        "编程开发",
+        [
+            "editor",
+            "ide",
+            "sdk",
+            "api",
+            "framework",
+            "library",
+            "package",
+            "rust",
+            "python",
+            "typescript",
+            "javascript",
+            "npm",
+            "编译器",
+            "template",
+            "starter",
+            "boilerplate",
+            "markdown",
+            "记事本",
+            "emacs",
+            "vim",
+            "vscode",
+            "git",
+            "pr",
+            "commit",
+            "blog",
+            "cms",
+            "font",
+            "字体",
+            "monospace",
+            "qml",
+            "ui-kit",
+            "翻译",
+            "translate",
+            "ant-d",
+            "crawler",
+            "爬虫",
+            "rpa",
+            "web自动化",
+            "日历",
+            "备份",
+            "fork",
+            "第三方",
+            "holiday",
+            "节假日",
+            "加密",
+            "crypto",
+            "shark",
+            "speed",
+            "速度",
+            "离线",
+            "survival",
+            "tshark",
+            "nginx",
+            "端口",
+            "port",
+            "serverbox",
+        ],
+    ),
+    (
+        "桌面工具",
+        [
+            "desktop",
+            "剪贴板",
+            "便签",
+            "粘贴",
+            "clipboard",
+            "note",
+            "便签",
+            "屏幕",
+            "截图",
+            "screenshot",
+            "pet",
+            "宠物",
+            "压缩",
+            "鼠标",
+            "图床",
+            "日历",
+            "时钟",
+            "颜色",
+            "color",
+            "picker",
+            "新标签页",
+            "网页.*app",
+            "web-to-app",
+            "pake",
+            "输入流转",
+            "压缩软件",
+            "画中画",
+        ],
+    ),
+    (
+        "系统工具",
+        [
+            "系统",
+            "优化",
+            "清理",
+            "性能",
+            "管理",
+            "system",
+            "utility",
+            "windows",
+            "macos",
+            "linux",
+            "优化",
+            "清理",
+            "tool",
+            "监控",
+            "monitor",
+            "硬件",
+            "wsl",
+            "distro",
+            "引导",
+            "grub",
+            "powershell",
+            "debloat",
+            "emoji",
+            "进程",
+            "ad",
+            "广告",
+            "hosts",
+            "换源",
+            "自托管",
+            "托管",
+            "panel",
+        ],
+    ),
+    (
+        "媒体工具",
+        [
+            "player",
+            "播放器",
+            "music",
+            "音乐",
+            "video",
+            "视频",
+            "iptv",
+            "电视",
+            "media",
+            "下载器",
+            "download",
+            "媒体",
+            "jellyfin",
+            "影视",
+            "bilibili",
+            "bili",
+            "画中画",
+            "rss",
+            "feed",
+            "pixiv",
+            "直播",
+            "蓝奏云",
+            "一起看",
+            "synctv",
+        ],
+    ),
+    (
+        "Awesome 列表",
+        [
+            "awesome",
+            "精选",
+            "资源大全",
+            "合集",
+            "collection",
+            "list",
+            "awesome-",
+            "精选的",
+        ],
+    ),
+    (
+        "网络工具",
+        [
+            "proxy",
+            "dpi",
+            "vpn",
+            "ssh",
+            "网络",
+            "代理",
+            "科学上网",
+            "network",
+            "bypass",
+            "防火墙",
+            "订阅转换",
+            "转发",
+            "dns",
+            "cloudflare",
+            "cdn",
+            "服务器",
+        ],
+    ),
+    (
+        "浏览器扩展",
+        [
+            "chrome",
+            "extension",
+            "插件",
+            "bookmarklet",
+            "微博",
+            "brave",
+            "浏览器",
+            "superium",
+        ],
+    ),
+    (
+        "输入法",
+        [
+            "输入法",
+            "拼音",
+            "ime",
+            "ibus",
+        ],
+    ),
+    (
+        "学习资源",
+        [
+            "教程",
+            "学习",
+            "课程",
+            "guide",
+            "tutorial",
+            "book",
+            "入门",
+            "指南",
+            "实践",
+            "数学",
+            "security",
+            "网络安全",
+            "面试",
+            "求职",
+        ],
+    ),
+    (
+        "社交 / 社区",
+        [
+            "聊天",
+            "im",
+            "微信",
+            "telegram",
+            "端到端",
+            "mixgram",
+            "elementary",
+        ],
+    ),
 ]
 
 
@@ -326,6 +540,7 @@ def build_html(projects):
 
     # 转 JSON 嵌入 HTML
     import json
+
     projects_json = json.dumps(projects, ensure_ascii=False)
     month_stats_json = json.dumps(month_stats, ensure_ascii=False)
     categories_json = json.dumps(all_categories, ensure_ascii=False)
@@ -343,7 +558,7 @@ def build_html(projects):
     )
 
 
-HTML_TEMPLATE = '''<!DOCTYPE html>
+HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
@@ -995,7 +1210,7 @@ renderGrid();
 </script>
 </body>
 </html>
-'''
+"""
 
 if __name__ == "__main__":
     print("🔄 正在收集数据...")
@@ -1014,5 +1229,5 @@ if __name__ == "__main__":
     output_path.write_text(html, "utf-8")
     print(f"✅ 网站已生成: {output_path}")
     print(f"   🗂️  {len(MONTH_ORDER)} 个月份")
-    print(f"   📊  {len(set(p.get('category','') for p in projects))} 个分类")
+    print(f"   📊  {len(set(p.get('category', '') for p in projects))} 个分类")
     print(f"   📄  文件大小: {len(html.encode()):,} 字节")
