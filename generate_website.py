@@ -27,7 +27,8 @@ MONTH_LABELS = {
     "202604": "2026.04",
     "202605": "2026.05",
     "202606": "2026.06",
-}
+    "202607": "2026.07",
+ }
 
 MONTH_ORDER = sorted(MONTH_LABELS.keys())
 
@@ -148,7 +149,7 @@ CATEGORY_ALIASES = {
     "学术与写作": "学术 / 写作",
     "学术/写作": "学术 / 写作",
     "媒体与娱乐": "媒体工具",
-    "应用与客户端": "桌面工具",
+    "应用与客户端": "应用与客户端",
     "网络与代理": "网络工具",
     "Shell / 终端": "Shell / 终端",
 }
@@ -165,9 +166,9 @@ MANUAL_CATEGORIES = {
     "https://github.com/henrywhitaker3/Speedtest-Tracker": "网络工具",
     "https://github.com/Sanjeever/port_sentinel": "网络工具",
     "https://github.com/pbeenigg/LittleCrawler": "编程开发",
-    "https://github.com/flutter_server_box": "系统工具",
-    "https://github.com/Crosstalk-Solutions/项目游牧者": "其他",
     "https://github.com/wm94i/Work_Review": "桌面工具",
+    "https://github.com/OpenMarkdown-dev/OpenMarkdown-releases": "编程开发",
+    "https://github.com/AttemptD/AfuseKt-release": "应用与客户端",
 }
 
 
@@ -767,6 +768,46 @@ body {{
   opacity: 0.7;
 }}
 
+/* ============ Year Selector ============ */
+.years {{
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}}
+.years::-webkit-scrollbar {{
+  height: 4px;
+}}
+.years::-webkit-scrollbar-thumb {{
+  background: var(--border);
+  border-radius: 2px;
+}}
+.year-btn {{
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}}
+.year-btn:hover {{
+  background: var(--tab-hover-bg);
+  color: var(--text);
+}}
+.year-btn.active {{
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
+  border-color: var(--tab-active-bg);
+}}
+
 /* ============ Filters ============ */
 .filters {{
   max-width: 1200px;
@@ -1028,6 +1069,7 @@ body {{
 
 <!-- ============ TABS ============ -->
 <div class="tabs-wrapper">
+  <div class="years" id="years"></div>
   <div class="tabs" id="tabs"></div>
 </div>
 
@@ -1068,6 +1110,7 @@ const ALL_CATEGORIES = {categories_json};
 
 // ============ STATE ============
 let currentMonth = "{latest_month}";
+let currentYear = "{latest_month}".slice(0, 4);
 let currentSearch = "";
 let currentCategory = "";
 
@@ -1085,12 +1128,49 @@ function renderStats() {{
   `;
 }}
 
+// ============ RENDER YEARS ============
+function getYears() {{
+  const years = new Set();
+  MONTH_STATS.forEach(m => {{
+    if (m.count > 0) {{
+      years.add(m.id.slice(0, 4));
+    }}
+  }});
+  return Array.from(years).sort((a, b) => b.localeCompare(a));
+}}
+
+function renderYears() {{
+  const container = document.getElementById("years");
+  const years = getYears();
+  let html = "";
+  years.forEach(y => {{
+    html += `<button class="year-btn ${{y === currentYear ? 'active' : ''}}" onclick="switchYear('${{y}}')">${{y}}年</button>`;
+  }});
+  container.innerHTML = html;
+}}
+
+function switchYear(year) {{
+  currentYear = year;
+  const monthsInYear = MONTH_STATS.filter(m => m.id.startsWith(year) && m.count > 0);
+  if (monthsInYear.length > 0) {{
+    currentMonth = monthsInYear[monthsInYear.length - 1].id;
+  }} else {{
+    currentMonth = "all";
+  }}
+  renderYears();
+  renderTabs();
+  renderGrid();
+  document.getElementById("backTop").click();
+}}
+
+
 // ============ RENDER TABS ============
 function renderTabs() {{
   const container = document.getElementById("tabs");
   let html = `<button class="tab-btn ${{currentMonth === 'all' ? 'active' : ''}}" onclick="switchMonth('all')">全部 <span class="tab-count">${{PROJECTS.length}}</span></button>`;
   MONTH_STATS.forEach(m => {{
     if (m.count === 0) return;
+    if (!m.id.startsWith(currentYear)) return;
     html += `<button class="tab-btn ${{m.id === currentMonth ? 'active' : ''}}" onclick="switchMonth('${{m.id}}')">${{m.label}} <span class="tab-count">${{m.count}}</span></button>`;
   }});
   container.innerHTML = html;
@@ -1204,6 +1284,7 @@ window.addEventListener("scroll", () => {{
 
 // ============ INIT ============
 renderStats();
+renderYears();
 renderTabs();
 renderCategoryFilter();
 renderGrid();
